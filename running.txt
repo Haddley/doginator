@@ -1,0 +1,5 @@
+#restarting service
+
+sudo cp /home/neil/doginator/doginator.py /opt/doginator/doginator.py
+sudo systemctl restart doginator
+sudo journalctl -u doginator -f

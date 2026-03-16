@@ -1,0 +1,54 @@
+[Unit]
+Description=Doginator - Dog Bark Detection Service
+After=sound.target multi-user.target
+Wants=sound.target
+
+[Service]
+Type=simple
+User=doginator
+[Unit]
+Description=Doginator - Dog Bark Detection Service
+After=sound.target multi-user.target
+Wants=sound.target
+
+[Service]
+Type=simple
+User=doginator
+Group=audio
+
+# Adjust this path to wherever you deployed the script
+ExecStart=/opt/doginator/venv/bin/python3 /opt/doginator/doginator.py
+
+# Storage locations (override here or via environment file)
+Environment=DOGINATOR_LOG_DIR=/var/log/doginator
+Environment=DOGINATOR_RECORDINGS_DIR=/var/log/doginator/recordings
+
+# Automatically restart if it crashes
+Restart=on-failure
+RestartSec=10
+
+# Log stdout/stderr to the journal (view with: journalctl -u doginator -f)
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
+Group=audio
+
+# Adjust this path to wherever you deployed the script
+ExecStart=/opt/doginator/venv/bin/python3 /opt/doginator/doginator.py
+
+# Storage locations (override here or via environment file)
+Environment=DOGINATOR_LOG_DIR=/var/log/doginator
+Environment=DOGINATOR_RECORDINGS_DIR=/var/log/doginator/recordings
+
+# Automatically restart if it crashes
+Restart=on-failure
+RestartSec=10
+
+# Log stdout/stderr to the journal (view with: journalctl -u doginator -f)
+StandardOutput=journal
+StandardError=journal
+
+[Install]
+WantedBy=multi-user.target
