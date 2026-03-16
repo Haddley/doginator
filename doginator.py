@@ -21,8 +21,8 @@ from pydub import AudioSegment
 # --- Configuration ---
 SAMPLE_RATE = 44100          # Hz
 CHANNELS = 1                  # Mono
-CHUNK_DURATION = 0.1          # Seconds per detection chunk (100ms)
-BARK_THRESHOLD = 0.11         # RMS amplitude threshold (0.0–1.0); tune to your environment
+CHUNK_DURATION = 0.2          # Seconds per detection chunk (200ms)
+BARK_THRESHOLD = 0.15         # RMS amplitude threshold (0.0–1.0); tune to your environment
 MIN_BARK_DURATION = 0.3       # Minimum seconds above threshold to count as a bark
 RECORD_DURATION = 3.0         # Seconds to record after bark detected
 COOLDOWN = 10.0               # Seconds to wait before detecting next bark
@@ -141,7 +141,8 @@ class BarkDetector:
                     above_threshold_chunks += 1
                     peak_rms = max(peak_rms, rms)
                 else:
-                    above_threshold_chunks = max(0, above_threshold_chunks - 1)
+                    above_threshold_chunks = 0
+                    peak_rms = 0.0
 
                 now = datetime.now().timestamp()
                 cooldown_ok = (now - self.last_bark_time) >= COOLDOWN
