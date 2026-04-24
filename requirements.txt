@@ -2,3 +2,5 @@ sounddevice>=0.4.6
 numpy>=1.24.0
 pydub>=0.25.1
 audioop-lts>=0.2.1; python_version >= "3.13"
+tensorflow>=2.20.0
+tensorflow-hub>=0.16.0
