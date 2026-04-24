@@ -46,9 +46,8 @@ def _load_tf_deps():
     try:
         import numpy as np
         import tensorflow as tf
-        import tensorflow_hub as hub
         from pydub import AudioSegment
-        return np, tf, hub, AudioSegment
+        return np, tf, AudioSegment
     except ImportError:
         return None
 
@@ -57,15 +56,19 @@ def score_with_finetuned_model(paths):
     """Score using fine-tuned classifier. Returns {filename: bark_prob} or None if unavailable."""
     if not MODEL_PATH.exists():
         return None
+    yamnet_path = MODEL_PATH.parent / "yamnet"
+    if not yamnet_path.exists():
+        print("YAMNet model not found — run train_model.py first.")
+        return None
     libs = _load_tf_deps()
     if not libs:
-        print("tensorflow/tensorflow-hub not installed — cannot use fine-tuned model.")
+        print("tensorflow not installed — cannot use fine-tuned model.")
         return None
-    np, tf, hub, AudioSegment = libs
+    np, tf, AudioSegment = libs
 
     print("Loading fine-tuned bark classifier...")
     try:
-        yamnet = hub.load("https://tfhub.dev/google/yamnet/1")
+        yamnet = tf.saved_model.load(str(yamnet_path))
         classifier = tf.keras.models.load_model(MODEL_PATH)
     except Exception as e:
         print(f"Failed to load model: {e}")
@@ -96,10 +99,15 @@ def score_with_yamnet(paths):
     """Fallback: score with raw YAMNet bark class. Returns {} if unavailable."""
     libs = _load_tf_deps()
     if not libs:
-        print("tensorflow/tensorflow-hub not installed — skipping YAMNet scoring.")
-        print("Install with: pip install tensorflow tensorflow-hub\n")
+        print("tensorflow not installed — skipping YAMNet scoring.\n")
         return {}
-    np, tf, hub, AudioSegment = libs
+    np, tf, AudioSegment = libs
+
+    try:
+        import tensorflow_hub as hub
+    except ImportError:
+        print("tensorflow-hub not installed — skipping YAMNet scoring.\n")
+        return {}
 
     print("Loading YAMNet model (downloads ~25MB on first run)...")
     model = hub.load("https://tfhub.dev/google/yamnet/1")

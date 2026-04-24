@@ -104,9 +104,13 @@ class BarkClassifier:
             return False
         try:
             import tensorflow as tf
-            import tensorflow_hub as hub
+            yamnet_path = MODEL_PATH.parent / "yamnet"
+            if not yamnet_path.exists():
+                log.warning(f"YAMNet model not found at {yamnet_path} — run train_model.py and redeploy.")
+                self._available = False
+                return False
             log.info("Loading bark classifier (first bark after startup)...")
-            self._yamnet = hub.load("https://tfhub.dev/google/yamnet/1")
+            self._yamnet = tf.saved_model.load(str(yamnet_path))
             self._classifier = tf.keras.models.load_model(MODEL_PATH)
             log.info("Bark classifier ready.")
             self._available = True

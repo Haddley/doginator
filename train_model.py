@@ -5,7 +5,7 @@ Train a bark/not-bark classifier on top of YAMNet embeddings.
 Usage:
   python3 train_model.py
 
-Saves: model/bark_classifier.keras
+Saves: model/bark_classifier.keras and model/yamnet/
 Deploy: sudo cp -r model/ /opt/doginator/model/
 """
 import csv
@@ -51,8 +51,16 @@ def main():
         print("Too few bark examples to train. Label more clips first.")
         sys.exit(1)
 
-    print("Loading YAMNet...")
-    yamnet = hub.load("https://tfhub.dev/google/yamnet/1")
+    yamnet_path = MODEL_DIR / "yamnet"
+    if yamnet_path.exists():
+        print("Loading YAMNet from local cache...")
+        yamnet = tf.saved_model.load(str(yamnet_path))
+    else:
+        print("Loading YAMNet from TF Hub (downloads ~25MB)...")
+        yamnet = hub.load("https://tfhub.dev/google/yamnet/1")
+        print(f"Saving YAMNet locally for deployment...")
+        tf.saved_model.save(yamnet, str(yamnet_path))
+        print(f"YAMNet saved to {yamnet_path}")
 
     print(f"Extracting YAMNet embeddings from {len(paths)} clips...")
     X, y_clean = [], []
